@@ -99,9 +99,10 @@ final class RuleEditor {
 							<p class="rm-ca-field__desc"><?php esc_html_e( 'Where to POST a JSON payload. Compatible with Zapier, Make, n8n, custom servers.', 'richardmedina-crm-automation' ); ?></p>
 						</div>
 						<div class="rm-ca-field">
+							<?php $has_secret = ! empty( $options['webhook_secret_enc'] ) || ! empty( $options['webhook_secret'] ); ?>
 							<label class="rm-ca-field__label" for="rm_ca_webhook_secret"><?php esc_html_e( 'Shared secret (optional)', 'richardmedina-crm-automation' ); ?></label>
-							<input type="text" id="rm_ca_webhook_secret" name="options[webhook_secret]" value="<?php echo esc_attr( (string) ( $options['webhook_secret'] ?? '' ) ); ?>" />
-							<p class="rm-ca-field__desc"><?php esc_html_e( 'When set, payload is HMAC-signed in the X-RM-CA-Signature header (sha256=…).', 'richardmedina-crm-automation' ); ?></p>
+							<input type="password" id="rm_ca_webhook_secret" name="options[webhook_secret]" value="" autocomplete="new-password" placeholder="<?php echo esc_attr( $has_secret ? __( 'Secret saved (encrypted) — leave blank to keep, or paste a new one to replace', 'richardmedina-crm-automation' ) : __( 'paste a strong random string', 'richardmedina-crm-automation' ) ); ?>" />
+							<p class="rm-ca-field__desc"><?php esc_html_e( 'When set, payload is HMAC-signed in the X-RM-CA-Signature header (sha256=…). Stored encrypted in the database.', 'richardmedina-crm-automation' ); ?></p>
 						</div>
 					</div>
 				</div>

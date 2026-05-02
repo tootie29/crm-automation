@@ -76,5 +76,13 @@ Implement `SourceContract`. Hook into the form plugin's "after submission" actio
 ## Risk rules unique to this plugin
 
 - **Sync vs async**: never call `Destination::send()` synchronously from a form hook. Always go through the queue. A slow CRM must not block form UX.
-- **PII in logs**: the `payload_json` in the queue table contains submission data (names, emails, phones). Honor `log_retention_days` to purge regularly. Don't log full API tokens — `Encryption::mask()` for display.
-- **Webhook secret**: if a rule has a secret configured, the request MUST carry the `X-RM-CA-Signature` header. Don't add a "skip if no secret" path on the receiving side that defeats the check.
+- **PII in logs**: the `payload_json` in the queue table contains submission data (names, emails, phones). Honor `log_retention_days` to purge regularly. Don't log full API tokens — `Encryption::mask()` for display. The logs table caps `context_json` at 8 KB; the file logger keeps the full payload when `debug_mode` is on.
+- **Webhook secret**: if a rule has a secret configured, the request MUST carry the `X-RM-CA-Signature` header. Don't add a "skip if no secret" path on the receiving side that defeats the check. Webhook secrets are stored as `webhook_secret_enc` (encrypted via `Support\Encryption`); plaintext `webhook_secret` is only ever in `$_POST` during save.
+- **Webhook URL is an SSRF surface**. `RulesController::is_safe_outbound_url` rejects loopback, link-local, and RFC1918 private targets on save. Don't relax this without an explicit per-rule "allow internal targets" toggle and a documented threat model.
+
+## Encryption key dependency
+
+`Support\Encryption` derives its symmetric key from `wp_salt('auth')`. If `wp-config.php` is leaked (LFI / `.git` exposure / careless backup) the key is recoverable and every stored credential can be decrypted. This is the same threat model as the WP DB password living in `wp-config`. Mitigation paths if you suspect exposure:
+
+1. Rotate the salt (`wp config shuffle-salts`) — invalidates every stored credential AND every login session, so re-enter all CRM tokens / webhook secrets afterward.
+2. Audit `Settings::destination()` and the rules table for any plaintext that shouldn't be there.

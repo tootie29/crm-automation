@@ -62,8 +62,24 @@ final class Logger {
 		@file_put_contents( $file, $line, FILE_APPEND | LOCK_EX );
 	}
 
+	/**
+	 * Hard cap on the JSON context payload stored in the DB to keep the logs table
+	 * from ballooning when a form submission carries a large textarea or attachment.
+	 * The full payload is still written to the file logger when debug_mode is on.
+	 */
+	private const DB_CONTEXT_BYTES_MAX = 8192;
+
 	public static function db_log( string $level, string $message, array $context = [] ): void {
 		global $wpdb;
+
+		$context_json = null;
+		if ( $context ) {
+			$encoded = (string) wp_json_encode( $context );
+			if ( strlen( $encoded ) > self::DB_CONTEXT_BYTES_MAX ) {
+				$encoded = mb_strcut( $encoded, 0, self::DB_CONTEXT_BYTES_MAX - 24 ) . '"…(truncated)"}';
+			}
+			$context_json = $encoded;
+		}
 
 		$table = Schema::logs_table();
 		$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -76,7 +92,7 @@ final class Logger {
 				'destination_type' => (string) ( $context['destination_type'] ?? '' ),
 				'level'            => $level,
 				'message'          => $message,
-				'context_json'     => $context ? wp_json_encode( $context ) : null,
+				'context_json'     => $context_json,
 				'created_at'       => current_time( 'mysql', true ),
 			],
 			[ '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]

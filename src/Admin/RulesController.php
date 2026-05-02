@@ -111,7 +111,28 @@ final class RulesController {
 		}
 		if ( isset( $options['webhook_url'] ) && $options['webhook_url'] !== '' ) {
 			$options['webhook_url'] = esc_url_raw( $options['webhook_url'] );
+			if ( ! self::is_safe_outbound_url( $options['webhook_url'] ) ) {
+				wp_die(
+					esc_html__( 'Webhook URL must be a public http(s) URL. Loopback, link-local, and private network targets (127.0.0.1, 10.x, 172.16-31.x, 192.168.x, 169.254.x, IPv6 equivalents) are not allowed — they would let a misconfigured rule POST form data into internal services.', 'richardmedina-crm-automation' ),
+					esc_html__( 'Unsafe webhook URL', 'richardmedina-crm-automation' ),
+					[ 'response' => 400, 'back_link' => true ]
+				);
+			}
 		}
+
+		// Encrypt the webhook secret for symmetry with the GHL token. Plaintext entries
+		// (legacy or freshly typed by the admin) get encrypted on save; the worker
+		// transparently decrypts before signing. Empty submission preserves the prior
+		// encrypted value — same UX as the GHL token field.
+		if ( isset( $options['webhook_secret'] ) && $options['webhook_secret'] !== '' ) {
+			$options['webhook_secret_enc'] = \RichardMedina\CrmAutomation\Support\Encryption::encrypt( $options['webhook_secret'] );
+		} else {
+			$existing = $rule_id > 0 ? RuleRepository::find( $rule_id ) : null;
+			if ( $existing && ! empty( $existing->options['webhook_secret_enc'] ) ) {
+				$options['webhook_secret_enc'] = (string) $existing->options['webhook_secret_enc'];
+			}
+		}
+		unset( $options['webhook_secret'] );
 
 		$rule = new Rule( $rule_id, $enabled, $name, $source_type, $source_id, $destination_type, $mapping, $options );
 		$saved_id = RuleRepository::save( $rule );
@@ -123,5 +144,55 @@ final class RulesController {
 			'updated' => '1',
 		], admin_url( 'admin.php' ) ) );
 		exit;
+	}
+
+	/**
+	 * SSRF guard for the webhook destination URL. Rejects:
+	 *  - non-http(s) schemes
+	 *  - hostname literals "localhost" / *.localhost / *.local
+	 *  - IPv4 literals in loopback, link-local, multicast, broadcast, or RFC1918 private space
+	 *  - IPv6 literals that are loopback, link-local, ULA, or otherwise non-public
+	 *
+	 * Hostnames that are *names* (not literal IPs) are not DNS-resolved here — DNS-rebinding
+	 * is still possible at request time. This validator catches the common operator mistake of
+	 * pasting a private URL; defense-in-depth (e.g. an outbound network policy) handles the rest.
+	 */
+	private static function is_safe_outbound_url( string $url ): bool {
+		$parts = wp_parse_url( $url );
+		if ( ! is_array( $parts ) || empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+			return false;
+		}
+		if ( ! in_array( strtolower( $parts['scheme'] ), [ 'http', 'https' ], true ) ) {
+			return false;
+		}
+
+		$host = strtolower( $parts['host'] );
+
+		// Allow the site's own host even if it falls under .local / .localhost or a private IP —
+		// the admin can already POST to their own site, so allowing self-hostname adds no SSRF
+		// risk beyond what's already possible. Important for LocalWP / dev / self-test setups.
+		$home_host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		if ( $home_host !== '' && $host === $home_host ) {
+			return true;
+		}
+
+		if ( $host === 'localhost' || str_ends_with( $host, '.localhost' ) || str_ends_with( $host, '.local' ) ) {
+			return false;
+		}
+
+		// Hostname is a name (not an IP literal): we accept it here. DNS-rebinding remains a
+		// theoretical risk but is out of scope for v0.1's URL validator.
+		$ip_str = trim( $host, '[]' );
+		if ( filter_var( $ip_str, FILTER_VALIDATE_IP ) === false ) {
+			return true;
+		}
+
+		// Reject any IP literal that isn't in the public Internet ranges.
+		$public = filter_var(
+			$ip_str,
+			FILTER_VALIDATE_IP,
+			FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+		);
+		return $public !== false;
 	}
 }

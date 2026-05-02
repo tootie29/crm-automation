@@ -54,7 +54,14 @@ final class Destination implements DestinationContract {
 			return Result::failure( 0, 'Webhook destination requires a valid URL on the rule.', [], false );
 		}
 
-		$secret = (string) ( $rule_options['webhook_secret'] ?? '' );
+		// Prefer the encrypted secret saved by RulesController; fall back to plaintext for
+		// rules saved before the encrypt-on-save migration.
+		$secret = '';
+		if ( ! empty( $rule_options['webhook_secret_enc'] ) ) {
+			$secret = \RichardMedina\CrmAutomation\Support\Encryption::decrypt( (string) $rule_options['webhook_secret_enc'] );
+		} elseif ( ! empty( $rule_options['webhook_secret'] ) ) {
+			$secret = (string) $rule_options['webhook_secret'];
+		}
 
 		$payload = [
 			'mapped'     => $mapped,
