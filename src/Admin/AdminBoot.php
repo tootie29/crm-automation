@@ -57,8 +57,8 @@ final class AdminBoot {
 
 	public function register_menu(): void {
 		add_menu_page(
-			__( 'RM CRM Automation', 'richardmedina-crm-automation' ),
-			__( 'RM CRM Automation', 'richardmedina-crm-automation' ),
+			__( 'RichardMedina CRM Automation', 'richardmedina-crm-automation' ),
+			__( 'RM Automation', 'richardmedina-crm-automation' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			[ RulesPage::class, 'render' ],

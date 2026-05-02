@@ -52,7 +52,10 @@ final class LogsPage {
 			</div>
 			<div class="rm-ca-section__body">
 				<?php if ( empty( $rows ) ) : ?>
-					<p class="description"><?php esc_html_e( 'No log entries yet.', 'richardmedina-crm-automation' ); ?></p>
+					<div class="rm-ca-empty">
+						<strong><?php esc_html_e( 'No log entries yet', 'richardmedina-crm-automation' ); ?></strong>
+						<?php esc_html_e( 'Logs appear here as soon as a submission is dispatched.', 'richardmedina-crm-automation' ); ?>
+					</div>
 				<?php else : ?>
 					<table class="widefat striped rm-ca-logs-table">
 						<thead>

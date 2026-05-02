@@ -6,6 +6,10 @@
 .rm-ca-wrap .nav-tab-wrapper { margin: 0 0 24px; border-bottom: 1px solid #dcdcde; }
 .rm-ca-wrap .nav-tab { font-weight: 500; }
 
+/* Push the header down so admin notices don't visually crowd the dark gradient. */
+.rm-ca-wrap .notice + .rm-ca-header,
+.rm-ca-wrap .notice ~ .rm-ca-header { margin-top: 24px; }
+
 /* ---------- Header strip ---------- */
 .rm-ca-header {
 	display: flex; justify-content: space-between; align-items: center; gap: 24px;
@@ -108,23 +112,120 @@
 .rm-ca-field textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; min-height: 80px; }
 
 /* ---------- Mapping table ---------- */
-.rm-ca-mapping th, .rm-ca-mapping td { vertical-align: top; padding: 10px 12px; }
-.rm-ca-mapping td code { font-size: 11px; color: #6c7781; }
-.rm-ca-mapping select, .rm-ca-mapping input[type="text"] { width: 100%; }
+.rm-ca-mapping {
+	border: 1px solid #e2e4e7;
+	border-radius: 6px;
+	overflow: hidden;
+	margin: 8px 0 4px;
+}
+.rm-ca-mapping th,
+.rm-ca-mapping td {
+	vertical-align: top;
+	padding: 12px 14px;
+	border-bottom: 1px solid #f0f0f1;
+}
+.rm-ca-mapping thead th {
+	background: #fafafa;
+	font-size: 12px;
+	font-weight: 600;
+	color: #6c7781;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+.rm-ca-mapping tbody tr:last-child th,
+.rm-ca-mapping tbody tr:last-child td { border-bottom: none; }
+.rm-ca-mapping tbody tr:hover { background: #fafbff; }
+.rm-ca-mapping td code {
+	font-size: 11px;
+	color: #6c7781;
+	background: #f1f3f5;
+	padding: 1px 6px;
+	border-radius: 3px;
+}
+.rm-ca-mapping td strong { font-weight: 600; color: #1d2327; }
+.rm-ca-mapping select,
+.rm-ca-mapping input[type="text"] { width: 100%; max-width: none; }
 .rm-ca-mapping .rm-ca-mapping-static { display: none; margin-top: 6px; }
 .rm-ca-mapping tr.is-static .rm-ca-mapping-field { display: none; }
 .rm-ca-mapping tr.is-static .rm-ca-mapping-static { display: block; }
 
-.rm-ca-custom-add { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-.rm-ca-custom-add input, .rm-ca-custom-add select { max-width: 320px; }
+.rm-ca-custom-add {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin-top: 14px;
+	padding: 14px;
+	background: #fafafa;
+	border: 1px dashed #c3c4c7;
+	border-radius: 6px;
+}
+.rm-ca-custom-add input,
+.rm-ca-custom-add select { max-width: 320px; flex: 1; }
 
-/* ---------- Logs / Rules tables ---------- */
+/* ---------- Rules / Logs tables ---------- */
+.rm-ca-rules-table,
+.rm-ca-logs-table {
+	border: 1px solid #e2e4e7;
+	border-radius: 6px;
+	overflow: hidden;
+	margin: 8px 0 0;
+	border-collapse: separate;
+	border-spacing: 0;
+}
+.rm-ca-rules-table th,
+.rm-ca-logs-table th {
+	background: #fafafa;
+	font-size: 12px;
+	font-weight: 600;
+	color: #6c7781;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding: 10px 14px;
+	border-bottom: 1px solid #e2e4e7;
+}
+.rm-ca-rules-table td,
+.rm-ca-logs-table td {
+	padding: 12px 14px;
+	border-bottom: 1px solid #f0f0f1;
+}
+.rm-ca-rules-table tbody tr:last-child td,
+.rm-ca-logs-table tbody tr:last-child td { border-bottom: none; }
+.rm-ca-rules-table tbody tr:hover,
+.rm-ca-logs-table tbody tr:hover { background: #fafbff; }
 .rm-ca-rules-table th, .rm-ca-rules-table td { vertical-align: middle; }
 .rm-ca-logs-table td { vertical-align: top; font-size: 12px; }
-.rm-ca-logs-table summary { cursor: pointer; }
+.rm-ca-logs-table summary { cursor: pointer; color: #2271b1; font-weight: 500; }
+.rm-ca-logs-table summary:hover { color: #135e96; }
+.rm-ca-logs-table code {
+	font-size: 11px;
+	color: #6c7781;
+	background: #f1f3f5;
+	padding: 1px 6px;
+	border-radius: 3px;
+}
 
-/* ---------- Footer + actions ---------- */
-.rm-ca-form-actions { display: flex; gap: 10px; align-items: center; margin: 18px 0 0; }
+/* ---------- Empty state ---------- */
+.rm-ca-empty {
+	padding: 28px 20px;
+	background: #fafafa;
+	border: 1px dashed #c3c4c7;
+	border-radius: 6px;
+	text-align: center;
+	color: #6c7781;
+	font-size: 13px;
+	margin: 12px 0 0;
+}
+.rm-ca-empty strong { display: block; color: #1d2327; font-size: 14px; margin-bottom: 4px; }
+
+/* ---------- Form actions row ---------- */
+.rm-ca-form-actions {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin: 24px 0 0;
+	padding: 16px 0 0;
+	border-top: 1px solid #e2e4e7;
+}
 .rm-ca-footer {
 	display: flex; justify-content: space-between; align-items: center;
 	margin: 32px 0 0; padding-top: 16px; border-top: 1px solid #e2e4e7;

@@ -139,7 +139,10 @@ final class RuleEditor {
 				</div>
 				<div class="rm-ca-section__body">
 					<?php if ( empty( $source_fields ) ) : ?>
-						<p class="description"><?php esc_html_e( 'Select a form and save the rule to see source fields here.', 'richardmedina-crm-automation' ); ?></p>
+						<div class="rm-ca-empty">
+							<strong><?php esc_html_e( 'Pick a form first', 'richardmedina-crm-automation' ); ?></strong>
+							<?php esc_html_e( 'Select a Gravity form above and save the rule, then come back here to map fields.', 'richardmedina-crm-automation' ); ?>
+						</div>
 					<?php else : ?>
 						<table class="widefat rm-ca-mapping">
 							<thead>

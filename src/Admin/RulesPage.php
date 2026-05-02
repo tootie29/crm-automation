@@ -51,7 +51,10 @@ final class RulesPage {
 				</p>
 
 				<?php if ( empty( $rules ) ) : ?>
-					<p class="description"><?php esc_html_e( 'No rules yet. Click "Add new rule" to wire up your first form-to-CRM connection.', 'richardmedina-crm-automation' ); ?></p>
+					<div class="rm-ca-empty">
+						<strong><?php esc_html_e( 'No rules yet', 'richardmedina-crm-automation' ); ?></strong>
+						<?php esc_html_e( 'Click "Add new rule" to wire up your first form-to-CRM connection.', 'richardmedina-crm-automation' ); ?>
+					</div>
 				<?php else : ?>
 					<table class="widefat striped rm-ca-rules-table">
 						<thead>
