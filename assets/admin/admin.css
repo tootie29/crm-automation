@@ -1,0 +1,141 @@
+/* RichardMedina CRM Automation — admin styles
+ * Same design language as richardmedina-security-hardening, prefixed rm-ca-.
+ */
+
+.rm-ca-wrap { max-width: 1200px; }
+.rm-ca-wrap .nav-tab-wrapper { margin: 0 0 24px; border-bottom: 1px solid #dcdcde; }
+.rm-ca-wrap .nav-tab { font-weight: 500; }
+
+/* ---------- Header strip ---------- */
+.rm-ca-header {
+	display: flex; justify-content: space-between; align-items: center; gap: 24px;
+	padding: 20px 24px; margin: 16px 0 24px;
+	background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4a 100%);
+	color: #f5f5f7; border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.rm-ca-header__brand { display: flex; align-items: center; gap: 16px; }
+.rm-ca-header__icon {
+	width: 44px; height: 44px; flex: 0 0 44px;
+	display: flex; align-items: center; justify-content: center;
+	background: rgba(99, 102, 241, .18); border-radius: 8px; color: #a5b4fc;
+}
+.rm-ca-header__icon svg { width: 26px; height: 26px; }
+.rm-ca-header__title { margin: 0; font-size: 18px; font-weight: 600; color: #f5f5f7; line-height: 1.2; padding: 0; }
+.rm-ca-header__sub { margin: 4px 0 0; font-size: 13px; color: #a1a1aa; }
+.rm-ca-header__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+/* ---------- Pills ---------- */
+.rm-ca-pill {
+	display: inline-flex; align-items: center; gap: 6px;
+	padding: 4px 10px; border-radius: 999px;
+	font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap;
+}
+.rm-ca-pill--neutral { background: rgba(255,255,255,.12); color: #e5e5e7; }
+.rm-ca-pill--success { background: #dcfce7; color: #166534; }
+.rm-ca-pill--warning { background: #fef3c7; color: #92400e; }
+.rm-ca-pill--danger  { background: #fee2e2; color: #991b1b; }
+.rm-ca-pill--info    { background: #dbeafe; color: #1e40af; }
+.rm-ca-pill__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.rm-ca-header .rm-ca-pill--success { background: rgba(74,222,128,.18); color: #4ade80; }
+.rm-ca-header .rm-ca-pill--warning { background: rgba(250,204,21,.18); color: #facc15; }
+.rm-ca-header .rm-ca-pill--danger  { background: rgba(248,113,113,.18); color: #f87171; }
+.rm-ca-header .rm-ca-pill--info    { background: rgba(165,180,252,.18); color: #a5b4fc; }
+
+/* ---------- Cards / Sections ---------- */
+.rm-ca-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px; margin: 0 0 24px;
+}
+.rm-ca-card {
+	background: #fff; border: 1px solid #e2e4e7; border-radius: 8px;
+	padding: 18px 20px; box-shadow: 0 1px 2px rgba(0,0,0,.03);
+}
+.rm-ca-card__label {
+	font-size: 11px; font-weight: 600; color: #6c7781;
+	text-transform: uppercase; letter-spacing: .06em; margin: 0 0 10px;
+}
+.rm-ca-card__value { font-size: 22px; font-weight: 600; color: #1d2327; line-height: 1.1; margin: 0; }
+
+.rm-ca-section {
+	background: #fff; border: 1px solid #e2e4e7; border-radius: 8px;
+	margin: 0 0 18px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.03);
+}
+.rm-ca-section__head { padding: 14px 20px; border-bottom: 1px solid #e2e4e7; background: #fafafa; }
+.rm-ca-section__title { margin: 0; font-size: 14px; font-weight: 600; color: #1d2327; }
+.rm-ca-section__sub { margin: 4px 0 0; font-size: 12px; color: #6c7781; }
+.rm-ca-section__body { padding: 4px 20px; }
+
+/* ---------- Rows + Toggle switch ---------- */
+.rm-ca-row {
+	display: flex; align-items: flex-start; gap: 16px;
+	padding: 16px 0; border-bottom: 1px solid #f0f0f1;
+}
+.rm-ca-row:last-child { border-bottom: none; }
+.rm-ca-row__main { flex: 1; min-width: 0; }
+.rm-ca-row__label { font-size: 13px; font-weight: 500; color: #1d2327; margin: 0; line-height: 1.4; display: block; }
+.rm-ca-row__desc  { font-size: 12px; color: #6c7781; margin: 6px 0 0; line-height: 1.5; }
+.rm-ca-row__control { flex: 0 0 auto; padding-top: 2px; }
+
+.rm-ca-switch { position: relative; display: inline-block; width: 40px; height: 22px; vertical-align: middle; }
+.rm-ca-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.rm-ca-switch__slider {
+	position: absolute; cursor: pointer; inset: 0;
+	background: #c3c4c7; border-radius: 22px; transition: background .18s ease;
+}
+.rm-ca-switch__slider::before {
+	content: ""; position: absolute; height: 16px; width: 16px;
+	left: 3px; top: 3px; background: #fff; border-radius: 50%;
+	transition: transform .18s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+.rm-ca-switch input:checked + .rm-ca-switch__slider { background: #6366f1; }
+.rm-ca-switch input:checked + .rm-ca-switch__slider::before { transform: translateX(18px); }
+.rm-ca-switch input:focus-visible + .rm-ca-switch__slider { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #6366f1; }
+
+/* ---------- Field row ---------- */
+.rm-ca-field { padding: 14px 0; border-bottom: 1px solid #f0f0f1; }
+.rm-ca-field:last-child { border-bottom: none; }
+.rm-ca-field__label { display: block; font-size: 13px; font-weight: 500; color: #1d2327; margin: 0 0 8px; }
+.rm-ca-field__desc  { font-size: 12px; color: #6c7781; margin: 6px 0 0; line-height: 1.5; }
+.rm-ca-field input[type="text"],
+.rm-ca-field input[type="url"],
+.rm-ca-field input[type="number"],
+.rm-ca-field input[type="password"],
+.rm-ca-field select,
+.rm-ca-field textarea { max-width: 600px; width: 100%; }
+.rm-ca-field textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; min-height: 80px; }
+
+/* ---------- Mapping table ---------- */
+.rm-ca-mapping th, .rm-ca-mapping td { vertical-align: top; padding: 10px 12px; }
+.rm-ca-mapping td code { font-size: 11px; color: #6c7781; }
+.rm-ca-mapping select, .rm-ca-mapping input[type="text"] { width: 100%; }
+.rm-ca-mapping .rm-ca-mapping-static { display: none; margin-top: 6px; }
+.rm-ca-mapping tr.is-static .rm-ca-mapping-field { display: none; }
+.rm-ca-mapping tr.is-static .rm-ca-mapping-static { display: block; }
+
+.rm-ca-custom-add { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+.rm-ca-custom-add input, .rm-ca-custom-add select { max-width: 320px; }
+
+/* ---------- Logs / Rules tables ---------- */
+.rm-ca-rules-table th, .rm-ca-rules-table td { vertical-align: middle; }
+.rm-ca-logs-table td { vertical-align: top; font-size: 12px; }
+.rm-ca-logs-table summary { cursor: pointer; }
+
+/* ---------- Footer + actions ---------- */
+.rm-ca-form-actions { display: flex; gap: 10px; align-items: center; margin: 18px 0 0; }
+.rm-ca-footer {
+	display: flex; justify-content: space-between; align-items: center;
+	margin: 32px 0 0; padding-top: 16px; border-top: 1px solid #e2e4e7;
+	font-size: 12px; color: #6c7781;
+}
+.rm-ca-footer a { text-decoration: none; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 782px) {
+	.rm-ca-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+	.rm-ca-header__meta { justify-content: flex-start; }
+	.rm-ca-grid { grid-template-columns: 1fr 1fr; }
+	.rm-ca-row { flex-direction: row; gap: 12px; }
+}

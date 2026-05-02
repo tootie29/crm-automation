@@ -1,0 +1,27 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Build artifacts
+*.zip
+/build/
+/dist/
+
+# Environment
+.env
+.env.*
+
+# Editor / OS
+.idea/
+.vscode/
+*.sublime-*
+.DS_Store
+Thumbs.db
+
+# Tooling caches
+.phpunit.result.cache
+.phpcs-cache
+/.php-cs-fixer.cache
+
+# Compiled translations
+/languages/*.mo
