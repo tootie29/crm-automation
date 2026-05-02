@@ -88,7 +88,7 @@ final class RulesController {
 		// Per-rule destination options.
 		$opts_in = (array) ( $_POST['options'] ?? [] );
 		$options = [];
-		foreach ( [ 'webhook_url', 'webhook_secret', 'source', 'tags' ] as $k ) {
+		foreach ( [ 'webhook_url', 'webhook_secret', 'source', 'tags', 'tag_prefix' ] as $k ) {
 			if ( isset( $opts_in[ $k ] ) ) {
 				$options[ $k ] = sanitize_text_field( (string) $opts_in[ $k ] );
 			}

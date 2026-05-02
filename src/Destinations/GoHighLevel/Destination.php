@@ -105,7 +105,10 @@ final class Destination implements DestinationContract {
 		}
 		$payload['source'] = $source;
 
-		// Tags: combine rule-level + mapped value (split on comma).
+		// Tags: combine rule-level + mapped value (split on comma), then optionally
+		// prefix each tag with rule_options.tag_prefix to namespace this rule's tags
+		// in the destination CRM. Prefix is a literal string concat — type "enquiry:"
+		// to get "enquiry:booking" etc.
 		$tags = [];
 		if ( ! empty( $rule_options['tags'] ) && is_string( $rule_options['tags'] ) ) {
 			$tags = array_merge( $tags, array_filter( array_map( 'trim', explode( ',', $rule_options['tags'] ) ) ) );
@@ -113,6 +116,10 @@ final class Destination implements DestinationContract {
 		if ( ! empty( $mapped['tags'] ) ) {
 			$mapped_tags = is_array( $mapped['tags'] ) ? $mapped['tags'] : explode( ',', (string) $mapped['tags'] );
 			$tags        = array_merge( $tags, array_filter( array_map( 'trim', $mapped_tags ) ) );
+		}
+		$prefix = isset( $rule_options['tag_prefix'] ) ? (string) $rule_options['tag_prefix'] : '';
+		if ( $prefix !== '' && ! empty( $tags ) ) {
+			$tags = array_map( static fn( string $t ): string => $prefix . $t, $tags );
 		}
 		if ( $tags ) {
 			$payload['tags'] = array_values( array_unique( $tags ) );

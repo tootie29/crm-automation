@@ -121,6 +121,13 @@ final class RuleEditor {
 							<label class="rm-ca-field__label" for="rm_ca_ghl_tags"><?php esc_html_e( 'Tags (comma-separated, applied to every contact)', 'richardmedina-crm-automation' ); ?></label>
 							<input type="text" id="rm_ca_ghl_tags" name="options[tags]" value="<?php echo esc_attr( (string) ( $options['tags'] ?? '' ) ); ?>" placeholder="lead,wp-form,contact" />
 						</div>
+						<div class="rm-ca-field">
+							<label class="rm-ca-field__label" for="rm_ca_ghl_tag_prefix"><?php esc_html_e( 'Tag prefix (optional, namespaces this rule\'s tags)', 'richardmedina-crm-automation' ); ?></label>
+							<input type="text" id="rm_ca_ghl_tag_prefix" name="options[tag_prefix]" value="<?php echo esc_attr( (string) ( $options['tag_prefix'] ?? '' ) ); ?>" placeholder="enquiry:" />
+							<p class="rm-ca-field__desc">
+								<?php esc_html_e( 'Prepended verbatim to every tag this rule sends (both the static tags above and any tags mapped from form fields). Example: with prefix "enquiry:" and a mapped tag value "booking", GHL receives "enquiry:booking". Useful when multiple sources tag contacts and you want to filter by origin.', 'richardmedina-crm-automation' ); ?>
+							</p>
+						</div>
 					</div>
 				</div>
 			<?php endif; ?>
