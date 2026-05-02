@@ -188,64 +188,104 @@ final class RuleEditor {
 										</td>
 									</tr>
 								<?php endforeach; ?>
-
-								<?php
-								// Custom field rows (cf:foo) the user has saved before.
-								$custom_keys = [];
-								foreach ( $mapping as $key => $spec ) {
-									if ( is_string( $key ) && str_starts_with( $key, 'cf:' ) ) {
-										$custom_keys[ $key ] = $spec;
-									}
-								}
-								if ( ! empty( $custom_keys ) ) {
-									foreach ( $custom_keys as $key => $spec ) :
-										?>
-										<tr>
-											<td>
-												<strong><?php echo esc_html( __( 'Custom field', 'richardmedina-crm-automation' ) ); ?></strong>
-												<br>
-												<code><?php echo esc_html( $key ); ?></code>
-											</td>
-											<td>
-												<select name="mapping[<?php echo esc_attr( $key ); ?>][mode]">
-													<option value="field"  <?php selected( $spec['mode'], 'field' ); ?>>Form field</option>
-													<option value="static" <?php selected( $spec['mode'], 'static' ); ?>>Static value</option>
-												</select>
-											</td>
-											<td>
-												<select name="mapping[<?php echo esc_attr( $key ); ?>][value]" class="rm-ca-mapping-field">
-													<option value="">— No mapping —</option>
-													<?php foreach ( $source_fields as $sf ) : ?>
-														<option value="<?php echo esc_attr( $sf['key'] ); ?>" <?php selected( $spec['mode'] === 'field' ? $spec['value'] : '', $sf['key'] ); ?>>
-															<?php echo esc_html( $sf['label'] . ' [' . $sf['key'] . ']' ); ?>
-														</option>
-													<?php endforeach; ?>
-												</select>
-												<input type="text" name="mapping[<?php echo esc_attr( $key ); ?>][static_value]" class="rm-ca-mapping-static" value="<?php echo esc_attr( $spec['mode'] === 'static' ? $spec['value'] : '' ); ?>" placeholder="Static value" />
-											</td>
-										</tr>
-										<?php
-									endforeach;
-								}
-								?>
 							</tbody>
 						</table>
-
-						<p class="rm-ca-field__desc">
-							<?php esc_html_e( 'Need a custom field? Add a row by typing its GHL custom-field key (without "cf:") and a source field id below — supports per-location custom fields.', 'richardmedina-crm-automation' ); ?>
-						</p>
-						<div class="rm-ca-custom-add">
-							<input type="text" name="custom_key" placeholder="<?php esc_attr_e( 'GHL custom field key (e.g. account_type)', 'richardmedina-crm-automation' ); ?>" />
-							<select name="custom_source">
-								<option value="">— Form field —</option>
-								<?php foreach ( $source_fields as $sf ) : ?>
-									<option value="<?php echo esc_attr( $sf['key'] ); ?>"><?php echo esc_html( $sf['label'] . ' [' . $sf['key'] . ']' ); ?></option>
-								<?php endforeach; ?>
-							</select>
-						</div>
 					<?php endif; ?>
 				</div>
 			</div>
+
+			<?php if ( ! empty( $source_fields ) ) :
+				$existing_custom = [];
+				foreach ( $mapping as $k => $spec ) {
+					if ( is_string( $k ) && str_starts_with( $k, 'cf:' ) ) {
+						$existing_custom[] = [
+							'key'   => substr( $k, 3 ),
+							'mode'  => (string) ( $spec['mode'] ?? 'field' ),
+							'value' => (string) ( $spec['value'] ?? '' ),
+						];
+					}
+				}
+				$source_fields_options_html = '<option value="">' . esc_html__( '— No mapping —', 'richardmedina-crm-automation' ) . '</option>';
+				foreach ( $source_fields as $sf ) {
+					$source_fields_options_html .= sprintf(
+						'<option value="%s">%s</option>',
+						esc_attr( $sf['key'] ),
+						esc_html( $sf['label'] . ' [' . $sf['key'] . ']' )
+					);
+				}
+				?>
+				<div class="rm-ca-section">
+					<div class="rm-ca-section__head">
+						<h3 class="rm-ca-section__title"><?php esc_html_e( 'Custom fields', 'richardmedina-crm-automation' ); ?></h3>
+						<p class="rm-ca-section__sub"><?php esc_html_e( 'Map any number of GHL custom fields. Use the location\'s custom field key (without "cf:" prefix) — keys are visible in GHL under Settings → Custom Fields.', 'richardmedina-crm-automation' ); ?></p>
+					</div>
+					<div class="rm-ca-section__body">
+
+						<table class="widefat rm-ca-mapping rm-ca-cf-table">
+							<thead>
+								<tr>
+									<th style="width:30%;"><?php esc_html_e( 'GHL custom field key', 'richardmedina-crm-automation' ); ?></th>
+									<th style="width:18%;"><?php esc_html_e( 'Mode', 'richardmedina-crm-automation' ); ?></th>
+									<th><?php esc_html_e( 'Source field / static value', 'richardmedina-crm-automation' ); ?></th>
+									<th style="width:1%;"></th>
+								</tr>
+							</thead>
+							<tbody class="rm-ca-cf-rows">
+								<?php foreach ( $existing_custom as $i => $row ) : ?>
+									<tr class="rm-ca-cf-row<?php echo $row['mode'] === 'static' ? ' is-static' : ''; ?>">
+										<td>
+											<input type="text" name="custom_fields[<?php echo (int) $i; ?>][key]" value="<?php echo esc_attr( $row['key'] ); ?>" placeholder="<?php esc_attr_e( 'e.g. account_type', 'richardmedina-crm-automation' ); ?>" />
+										</td>
+										<td>
+											<select name="custom_fields[<?php echo (int) $i; ?>][mode]">
+												<option value="field"  <?php selected( $row['mode'], 'field' ); ?>><?php esc_html_e( 'Form field', 'richardmedina-crm-automation' ); ?></option>
+												<option value="static" <?php selected( $row['mode'], 'static' ); ?>><?php esc_html_e( 'Static value', 'richardmedina-crm-automation' ); ?></option>
+											</select>
+										</td>
+										<td>
+											<select name="custom_fields[<?php echo (int) $i; ?>][value]" class="rm-ca-mapping-field">
+												<option value=""><?php esc_html_e( '— No mapping —', 'richardmedina-crm-automation' ); ?></option>
+												<?php foreach ( $source_fields as $sf ) : ?>
+													<option value="<?php echo esc_attr( $sf['key'] ); ?>" <?php selected( $row['mode'] === 'field' ? $row['value'] : '', $sf['key'] ); ?>>
+														<?php echo esc_html( $sf['label'] . ' [' . $sf['key'] . ']' ); ?>
+													</option>
+												<?php endforeach; ?>
+											</select>
+											<input type="text" name="custom_fields[<?php echo (int) $i; ?>][static_value]" class="rm-ca-mapping-static" value="<?php echo esc_attr( $row['mode'] === 'static' ? $row['value'] : '' ); ?>" placeholder="<?php esc_attr_e( 'Static value', 'richardmedina-crm-automation' ); ?>" />
+										</td>
+										<td>
+											<button type="button" class="button-link rm-ca-cf-remove" aria-label="<?php esc_attr_e( 'Remove this custom field row', 'richardmedina-crm-automation' ); ?>">&times;</button>
+										</td>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+
+						<p>
+							<button type="button" class="button rm-ca-cf-add" data-next-index="<?php echo (int) count( $existing_custom ); ?>">
+								<?php esc_html_e( '+ Add custom field', 'richardmedina-crm-automation' ); ?>
+							</button>
+						</p>
+
+						<template id="rm-ca-cf-template">
+							<tr class="rm-ca-cf-row">
+								<td><input type="text" name="custom_fields[__INDEX__][key]" placeholder="<?php esc_attr_e( 'e.g. account_type', 'richardmedina-crm-automation' ); ?>" /></td>
+								<td>
+									<select name="custom_fields[__INDEX__][mode]">
+										<option value="field"><?php esc_html_e( 'Form field', 'richardmedina-crm-automation' ); ?></option>
+										<option value="static"><?php esc_html_e( 'Static value', 'richardmedina-crm-automation' ); ?></option>
+									</select>
+								</td>
+								<td>
+									<select name="custom_fields[__INDEX__][value]" class="rm-ca-mapping-field"><?php echo $source_fields_options_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></select>
+									<input type="text" name="custom_fields[__INDEX__][static_value]" class="rm-ca-mapping-static" placeholder="<?php esc_attr_e( 'Static value', 'richardmedina-crm-automation' ); ?>" />
+								</td>
+								<td><button type="button" class="button-link rm-ca-cf-remove" aria-label="<?php esc_attr_e( 'Remove this custom field row', 'richardmedina-crm-automation' ); ?>">&times;</button></td>
+							</tr>
+						</template>
+					</div>
+				</div>
+			<?php endif; ?>
 
 			<div class="rm-ca-form-actions">
 				<button type="submit" class="button button-primary"><?php esc_html_e( 'Save rule', 'richardmedina-crm-automation' ); ?></button>

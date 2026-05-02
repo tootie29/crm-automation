@@ -162,6 +162,21 @@
 .rm-ca-custom-add input,
 .rm-ca-custom-add select { max-width: 320px; flex: 1; }
 
+/* Custom-field repeater */
+.rm-ca-cf-add { margin-top: 10px; }
+.rm-ca-cf-remove {
+	color: #b32d2e;
+	font-size: 18px;
+	line-height: 1;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 4px 8px;
+	border-radius: 3px;
+}
+.rm-ca-cf-remove:hover { background: #fee2e2; color: #991b1b; }
+.rm-ca-cf-table input[type="text"] { width: 100%; }
+
 /* ---------- Rules / Logs tables ---------- */
 .rm-ca-rules-table,
 .rm-ca-logs-table {

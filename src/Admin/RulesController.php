@@ -78,11 +78,27 @@ final class RulesController {
 			$mapping[ $key ] = [ 'mode' => $mode, 'value' => $value ];
 		}
 
-		// Optional custom-field row.
-		$custom_key    = sanitize_text_field( (string) ( $_POST['custom_key'] ?? '' ) );
-		$custom_source = sanitize_text_field( (string) ( $_POST['custom_source'] ?? '' ) );
-		if ( $custom_key !== '' && $custom_source !== '' ) {
-			$mapping[ 'cf:' . $custom_key ] = [ 'mode' => 'field', 'value' => $custom_source ];
+		// Repeater: custom GHL fields, one row each.
+		$custom_in = (array) ( $_POST['custom_fields'] ?? [] );
+		foreach ( $custom_in as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$ck   = sanitize_text_field( (string) ( $row['key'] ?? '' ) );
+			$mode = (string) ( $row['mode'] ?? 'field' );
+			$cv   = $mode === 'static'
+				? sanitize_text_field( (string) ( $row['static_value'] ?? '' ) )
+				: sanitize_text_field( (string) ( $row['value'] ?? '' ) );
+
+			if ( $ck === '' || $cv === '' || ! in_array( $mode, [ 'field', 'static' ], true ) ) {
+				continue; // drop incomplete rows silently
+			}
+			// Strip any user-supplied "cf:" prefix so we don't end up with cf:cf:foo.
+			$ck = preg_replace( '/^cf:/i', '', $ck );
+			if ( $ck === '' ) {
+				continue;
+			}
+			$mapping[ 'cf:' . $ck ] = [ 'mode' => $mode, 'value' => $cv ];
 		}
 
 		// Per-rule destination options.
