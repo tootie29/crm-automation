@@ -33,6 +33,20 @@ final class Source implements SourceContract {
 	 */
 	public function on_submission( array $entry, array $form ): void {
 		try {
+			// GF2: skip entries that have been flagged as spam or moved to trash.
+			// gform_after_submission usually only fires for active entries, but third-party
+			// anti-spam plugins may downgrade status around this hook — never push junk to a CRM.
+			$status = (string) ( $entry['status'] ?? 'active' );
+			if ( in_array( $status, [ 'spam', 'trash' ], true ) ) {
+				Logger::info( 'gravityforms.skipped_non_active', [
+					'source_type' => self::TYPE,
+					'source_id'   => (string) ( $form['id'] ?? '' ),
+					'entry_id'    => (string) ( $entry['id'] ?? '' ),
+					'status'      => $status,
+				] );
+				return;
+			}
+
 			$fields = $this->collect_fields( $entry, $form );
 
 			$submission = new Submission(
@@ -43,6 +57,8 @@ final class Source implements SourceContract {
 				[
 					'form_title' => (string) ( $form['title'] ?? '' ),
 					'date'       => (string) ( $entry['date_created'] ?? '' ),
+					// GF3: this IP is whatever GFFormsModel::get_ip() returned, which
+					// itself respects X-Forwarded-For. Do not use for security decisions.
 					'ip'         => (string) ( $entry['ip'] ?? '' ),
 				]
 			);
@@ -105,6 +121,14 @@ final class Source implements SourceContract {
 	}
 
 	/**
+	 * Hard cap per individual field value to prevent a single oversized textarea
+	 * from bloating the queue's payload_json LONGTEXT row. GF doesn't enforce a
+	 * length limit on textareas server-side unless the admin set one; without this
+	 * cap an attacker could DoS the queue table by submitting MB-sized bodies.
+	 */
+	private const FIELD_VALUE_BYTES_MAX = 16384;
+
+	/**
 	 * @param array<string,mixed> $entry
 	 * @param array<string,mixed> $form
 	 * @return array<int,array{key:string,label:string,value:string,type:string}>
@@ -131,6 +155,15 @@ final class Source implements SourceContract {
 				continue; // skip meta keys (id, form_id, date_created, etc.)
 			}
 			$value = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+
+			// GF1: cap absurd field values. Truncate with a clear marker so a CRM agent
+			// reviewing the contact knows the value was clipped. Account for the suffix's
+			// actual byte length (including the multi-byte ellipsis) so we never go over.
+			if ( strlen( $value ) > self::FIELD_VALUE_BYTES_MAX ) {
+				$marker = ' …(truncated by RM CRM Automation)';
+				$value  = mb_strcut( $value, 0, self::FIELD_VALUE_BYTES_MAX - strlen( $marker ) ) . $marker;
+			}
+
 			$out[] = [
 				'key'   => $key,
 				'label' => $labels[ $key ] ?? $key,

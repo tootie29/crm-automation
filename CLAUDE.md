@@ -80,6 +80,14 @@ Implement `SourceContract`. Hook into the form plugin's "after submission" actio
 - **Webhook secret**: if a rule has a secret configured, the request MUST carry the `X-RM-CA-Signature` header. Don't add a "skip if no secret" path on the receiving side that defeats the check. Webhook secrets are stored as `webhook_secret_enc` (encrypted via `Support\Encryption`); plaintext `webhook_secret` is only ever in `$_POST` during save.
 - **Webhook URL is an SSRF surface**. `RulesController::is_safe_outbound_url` rejects loopback, link-local, and RFC1918 private targets on save. Don't relax this without an explicit per-rule "allow internal targets" toggle and a documented threat model.
 
+## Trust boundary with Gravity Forms
+
+We consume `gform_after_submission` and treat the entry array as untrusted input even though it has already been through GF's own validation:
+
+- **Field values are capped at 16 KB each** in `Source::collect_fields` (`FIELD_VALUE_BYTES_MAX`). Without this an unbounded textarea could DoS the `wp_rmca_queue.payload_json` LONGTEXT column. Truncation is marked inline so the CRM agent sees the cut.
+- **Spam / trash entries are skipped** before dispatch. `gform_after_submission` normally only fires for active entries, but third-party anti-spam plugins can downgrade status around this hook — never push junk to a CRM.
+- **Entry IP (`$entry['ip']`) is GF's `GFFormsModel::get_ip()`** which itself respects `X-Forwarded-For`. We record it as metadata only and **never use it for security decisions**. If you ever need a trustworthy client IP in this plugin, read `$_SERVER['REMOTE_ADDR']` directly.
+
 ## Encryption key dependency
 
 `Support\Encryption` derives its symmetric key from `wp_salt('auth')`. If `wp-config.php` is leaked (LFI / `.git` exposure / careless backup) the key is recoverable and every stored credential can be decrypted. This is the same threat model as the WP DB password living in `wp-config`. Mitigation paths if you suspect exposure:
