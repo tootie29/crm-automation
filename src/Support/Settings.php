@@ -65,9 +65,18 @@ final class Settings {
 		$clean['log_retention_days'] = max( 1, min( 365, (int) ( $input['log_retention_days'] ?? 30 ) ) );
 		$clean['max_attempts']       = max( 1, min( 20, (int) ( $input['max_attempts'] ?? 5 ) ) );
 
-		// destinations are written via update_destination() — preserve them.
-		$existing = get_option( self::OPTION_KEY, [] );
-		$clean['destinations'] = is_array( $existing['destinations'] ?? null ) ? $existing['destinations'] : $defaults['destinations'];
+		// Destinations:
+		//  - SettingsPage form omits this key, so we preserve whatever is already in DB.
+		//  - update_destination() includes a fully merged destinations array in $input,
+		//    so we trust it. Reading from DB here would clobber the new write.
+		if ( isset( $input['destinations'] ) && is_array( $input['destinations'] ) ) {
+			$clean['destinations'] = $input['destinations'];
+		} else {
+			$existing = get_option( self::OPTION_KEY, [] );
+			$clean['destinations'] = is_array( $existing['destinations'] ?? null )
+				? $existing['destinations']
+				: $defaults['destinations'];
+		}
 
 		return $clean;
 	}
