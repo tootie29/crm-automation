@@ -4,7 +4,7 @@ Tags: gravity-forms, gohighlevel, ghl, crm, webhook, automation
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,17 @@ Single-site only in v0.1.
 5. Visit **RM CRM Automation → Rules → Add new rule** to wire a form to a destination.
 
 == Changelog ==
+
+= 0.1.1 =
+Security: SSRF guard on the webhook URL (rejects loopback, link-local, RFC1918, IPv6 ULA, and non-http(s) schemes; allows the site's own host so dev / self-test setups still work).
+Security: webhook shared secret is now encrypted at rest, matching the GHL Private Integration Token.
+Security: cap individual Gravity Forms field values at 16 KB before they hit the queue (prevents DoS via giant textarea submissions).
+Security: skip Gravity Forms entries flagged as `spam` or `trash` instead of dispatching them to the CRM.
+Logs: cap `context_json` to 8 KB in the database log entries to prevent table bloat from large payloads.
+GHL: per-rule **Tag prefix** option to namespace tags this rule sends (e.g. `enquiry:` → `enquiry:booking`).
+Rule editor: custom-field mapping is now a true repeater — add / remove any number of GHL custom field rows in one save.
+Admin UX: shorter sidebar label, polished tables and section cards, empty-state cards on Rules / Logs / Rule editor, distinct form-actions divider.
+Bug fix: Destinations form now actually saves the Location ID and encrypted token (previous build's `Settings::sanitize` overwrote `destinations` with stale DB values on every `update_option`).
 
 = 0.1.0 =
 Initial release: Gravity Forms → GoHighLevel + Webhook with queue, retries, logs.
