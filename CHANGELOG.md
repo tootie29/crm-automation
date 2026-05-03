@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.0-beta — 2026-05-03
+
+### Admin UX (redesign — pending review, parallel to richardmedina-security-hardening v0.2.0)
+- **Layout shift to vertical sidebar nav** across all four admin pages (Rules / Destinations / Logs / Settings). Sticky 240px sidebar at >=1024px viewport with per-tab SVG icons (checklist, globe, document, gear), active-state indicator with chevron, and a Documentation link in the footer. Collapses to a horizontal pill nav on tablet, vertical stack on phone.
+- **Refreshed page header** in `View::header()`. Light surface card replacing the dark navy gradient. Indigo gradient brand mark, RichardMedina eyebrow, "CRM Automation" title, tagline, version + active-rules + queue-state + status pills aligned right with semantic colours.
+- **Refined card / section / row styling.** Section heads use a gradient white→slate-50 background. Setting rows have a hover wash and bigger touch targets.
+- **Sticky save bar on Settings** (Linear / Vercel / Stripe pattern). Pill-shaped dark bar appears at viewport bottom when the form is dirty, pulsing amber dot, "Discard" + "Save changes". Warns on tab close via `beforeunload`.
+- **Toggle switches refined** (indigo accent, larger 42×24 surface, focus ring).
+- **Form inputs** bordered with slate-200 default + indigo focus ring; monospace textareas; `<input type="number">` capped at 160px max-width.
+- **Tables** (Rules / Logs lists) now styled with the new section-card chrome — bordered surface, gradient header row, slate hover, rounded corners.
+- **Buttons** scoped under `.rm-ca-wrap`: `.button-primary` uses the indigo accent, all buttons get the slightly rounded radius.
+- **Scoped design tokens** (`--rm-ca-*`) replace ad-hoc hex literals.
+
+### Implementation note
+Zero per-page edits required — `View::nav()` opens the shell + main column, `View::footer()` closes them. Existing `RulesPage`, `DestinationsPage`, `LogsPage`, `SettingsPage` render unchanged structurally; the redesign is in `View.php` + `admin.css` + `admin.js` only. Settings round-trip, sanitize callback, and `register_setting` group are unchanged — settings serialization is identical.
+
+### Backed up to revert
+Pre-redesign files (v0.1.1) saved at `_backup/v0.1.1-pre-redesign-{timestamp}/` inside the plugin directory. Gitignored — local only.
+
 ## 0.1.1 — 2026-05-03
 
 ### Security

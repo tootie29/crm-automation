@@ -19,7 +19,7 @@ final class SettingsPage {
 		View::header();
 		View::nav( AdminBoot::PAGE_SLUG . '-settings' );
 		?>
-		<form action="options.php" method="post">
+		<form id="rm-ca-form" action="options.php" method="post" data-rm-ca-form>
 			<?php settings_fields( AdminBoot::SETTINGS_GROUP ); ?>
 
 			<div class="rm-ca-section">
@@ -73,8 +73,22 @@ final class SettingsPage {
 
 			<div class="rm-ca-form-actions">
 				<?php submit_button( __( 'Save changes', 'richardmedina-crm-automation' ), 'primary', 'submit', false ); ?>
+				<button type="reset" class="button button-link" data-rm-ca-discard><?php esc_html_e( 'Discard', 'richardmedina-crm-automation' ); ?></button>
 			</div>
 		</form>
+
+		<div class="rm-ca-savebar" data-rm-ca-savebar hidden>
+			<div class="rm-ca-savebar__inner">
+				<p class="rm-ca-savebar__msg">
+					<span class="rm-ca-savebar__dot" aria-hidden="true"></span>
+					<?php esc_html_e( 'You have unsaved changes', 'richardmedina-crm-automation' ); ?>
+				</p>
+				<div class="rm-ca-savebar__actions">
+					<button type="button" class="button" data-rm-ca-discard><?php esc_html_e( 'Discard', 'richardmedina-crm-automation' ); ?></button>
+					<button type="submit" class="button button-primary" form="rm-ca-form"><?php esc_html_e( 'Save changes', 'richardmedina-crm-automation' ); ?></button>
+				</div>
+			</div>
+		</div>
 		<?php
 		View::footer();
 		View::close_wrap();

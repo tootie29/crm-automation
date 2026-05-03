@@ -59,9 +59,60 @@
 		});
 	}
 
+	/**
+	 * Sticky save bar — dirty-state detection on the Settings form.
+	 * Shows the bar when the form differs from its initial state, hides
+	 * when clean, warns on tab close when dirty.
+	 */
+	function bindSaveBar() {
+		const form    = document.getElementById('rm-ca-form');
+		const savebar = document.querySelector('[data-rm-ca-savebar]');
+		if (!form || !savebar) {
+			return;
+		}
+
+		const snapshot = function () {
+			const data = new FormData(form);
+			const out  = [];
+			for (const pair of data.entries()) {
+				out.push(pair[0] + '=' + pair[1]);
+			}
+			out.sort();
+			return out.join('&');
+		};
+
+		let initial = snapshot();
+
+		const update = function () {
+			savebar.hidden = (snapshot() === initial);
+		};
+
+		form.addEventListener('input',  update);
+		form.addEventListener('change', update);
+
+		document.querySelectorAll('[data-rm-ca-discard]').forEach(function (btn) {
+			btn.addEventListener('click', function (e) {
+				e.preventDefault();
+				form.reset();
+				window.setTimeout(function () {
+					initial = snapshot();
+					update();
+				}, 0);
+			});
+		});
+
+		window.addEventListener('beforeunload', function (e) {
+			if (snapshot() !== initial) {
+				e.preventDefault();
+				e.returnValue = '';
+			}
+		});
+	}
+
 	function init() {
 		bindMapping();
 		bindCustomFieldRepeater();
+		bindSaveBar();
 	}
 
 	if (document.readyState === 'loading') {

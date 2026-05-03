@@ -3,7 +3,7 @@
  * Plugin Name:       RichardMedina CRM Automation
  * Plugin URI:        https://richardmedina.com.au/plugins/richardmedina-crm-automation
  * Description:       Pipes form submissions (Gravity Forms in v0.1) into external CRMs (GoHighLevel + generic webhook in v0.1) with field mapping, async queue, retries, and an audit log.
- * Version:           0.1.1
+ * Version:           0.2.0-beta
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Richard Medina
@@ -18,7 +18,7 @@ declare( strict_types=1 );
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'RM_CA_VERSION', '0.1.1' );
+define( 'RM_CA_VERSION', '0.2.0-beta' );
 define( 'RM_CA_FILE', __FILE__ );
 define( 'RM_CA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'RM_CA_URL', plugin_dir_url( __FILE__ ) );

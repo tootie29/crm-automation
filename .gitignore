@@ -25,3 +25,6 @@ Thumbs.db
 
 # Compiled translations
 /languages/*.mo
+
+# Local pre-redesign / pre-mutation snapshots (revert-only, not source)
+/_backup/
