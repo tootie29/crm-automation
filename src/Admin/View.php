@@ -142,6 +142,11 @@ final class View {
 
 	public static function open_wrap(): void {
 		echo '<div class="wrap rm-ca-wrap rm-ca-wrap--v2">';
+		// Hidden h1 anchors WordPress's notice-relocator (wp-admin/js/common.js
+		// hoists every .notice to right after the first <h1> in .wrap). Without
+		// this, the notices fall back to landing inside our <header> element,
+		// breaking the page-header card layout.
+		echo '<h1 class="screen-reader-text">' . esc_html__( 'RichardMedina CRM Automation', 'richardmedina-crm-automation' ) . '</h1>';
 	}
 
 	public static function close_wrap(): void {
